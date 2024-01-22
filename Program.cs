@@ -6,20 +6,6 @@ namespace Agenda
     {
         static void Main(string[] args)
         {
-<<<<<<< HEAD
-            string opcio = "";
-            while (opcio != "Q" || opcio != "q")
-            {
-                Console.Clear();
-                opcio = Menu();
-            }
-
-        }
-        static string Menu()
-        {
-            
-            string opcio = "";
-=======
             char opcio = '0';
             while (opcio != 'q' && opcio != 'Q')
             {
@@ -35,16 +21,9 @@ namespace Agenda
                 MostrarOpcio(opcio);
                 
             }
-
-        }
-
-        static void MostrarOpcio(char opcio)
-        {
-
         }
         static string Menu()
         {
->>>>>>> 4cf5c3f7b0cddca9e1f13980fdf6d44331806b92
             Console.Clear();
             string menu =
 
@@ -62,42 +41,56 @@ namespace Agenda
                $"\t\t\t\t\t ╚════════════════════════════════╝" +
                $"\n\n" + "Prem el botó per seleccionar la opció desitjada";
 
-<<<<<<< HEAD
-            Console.WriteLine(menu);
-            Console.ReadLine();
-            switch (opcio)
-            {
-                case "1":
-
-                    break;
-                case "2":
-
-                    break;
-                case "3":
-
-                    break;
-                case "4":
-
-                    break;
-                case "5":
-
-                    break;
-                case "6":
-
-                    break;
-            }
-
-
-            return opcio;
-=======
             return menu;
 
         }
-
+        static void MostrarOpcio(char opcio)
+        {
+            switch (opcio)
+            {
+                case '1':
+                    break;
+                case '2':
+                    break;
+                case '3':
+                    break;
+                case '4':
+                    break;
+                case '5':
+                    break;
+                case '6':
+                    break;
+            }
+        }
         static void DonarAlta()
         {
 
->>>>>>> 4cf5c3f7b0cddca9e1f13980fdf6d44331806b92
+
+        }
+
+        static void RecuperarUsuari()
+        {
+
+        }
+
+        static void ModificarUsuari()
+        {
+
+        }
+
+        static void EliminarUsuari()
+        {
+
+        }
+
+        static void MostrarAgenda()
+        {
+
+        }
+
+        static void OrdenarAgenda()
+        {
+
         }
     }
 }
