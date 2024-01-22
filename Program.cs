@@ -4,12 +4,18 @@
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            string opcio = "";
+            while (opcio != "Q" || opcio != "q")
+            {
+                Console.Clear();
+                opcio = Menu();
+            }
+
         }
-        static void Menu()
+        static string Menu()
         {
             
-            char opcio = ' ';
+            string opcio = "";
             Console.Clear();
             string menu =
 
@@ -28,6 +34,31 @@
                $"\n\n" + "Prem el botó per seleccionar la opció desitjada";
 
             Console.WriteLine(menu);
+            Console.ReadLine();
+            switch (opcio)
+            {
+                case "1":
+
+                    break;
+                case "2":
+
+                    break;
+                case "3":
+
+                    break;
+                case "4":
+
+                    break;
+                case "5":
+
+                    break;
+                case "6":
+
+                    break;
+            }
+
+
+            return opcio;
         }
     }
 }
