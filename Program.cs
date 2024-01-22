@@ -71,7 +71,7 @@ namespace Agenda
 
         static void DonarAlta()
         {
-            string nom, cognom1, cognom2, dni, telefon, correu, aux;
+            string nom, cognom1, cognom2, dni=" ", telefon, correu, agenda;
             DateTime dataNaixament;
             Console.WriteLine("Escriu el teu nom:");
             nom = Console.ReadLine();
@@ -86,20 +86,16 @@ namespace Agenda
             cognom2 = NomVerificat(cognom2);
             Console.Clear();
             //DNI
-
-
-
             telefon = VerificaTelefon();
             dataNaixament = VerificaDataNaixament();
             correu = VerificaCorreu();
-
-            do {
-                Console.WriteLine("Escriu el teu nom:");
-                nom = Console.ReadLine();
-
-            } 
-            while (nom != null);
-            
+            StreamReader sr = new StreamReader(@"./agenda.txt");
+            StreamWriter sw = new StreamWriter(@"./agenda.txt");
+            agenda = sr.ReadToEnd();
+            sw.WriteLine(agenda);
+            sw.WriteLine($"{nom},{cognom1},{cognom2},{dni},{telefon},{dataNaixament},{correu}");
+            sr.Close();
+            sw.Close();
         }
 
         static string NomVerificat(string nom)
@@ -162,14 +158,14 @@ namespace Agenda
             Console.Clear();
             Console.WriteLine("Escriu el teu correu electronic:");
             correu = Console.ReadLine();
-            while (Regex.IsMatch(correu, @"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"))
+            while (!Regex.IsMatch(correu, @"^[a-zA-Z0-9._%-]{3,}@[a-zA-Z0-9._%-]{3,}\.(com||es)$"))
             {
                 Console.Clear();
                 Console.WriteLine("El correu esta mal escrit");
                 Console.WriteLine("Prova a escriure el correu una altra vegada");
                 correu = Console.ReadLine();
             }
-            return correu;
+            return correu.ToLower();
         }
         
 
