@@ -1,15 +1,35 @@
-﻿namespace Agenda
+﻿using System.Linq.Expressions;
+
+namespace Agenda
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            char opcio = '0';
+            while (opcio != 'q' && opcio != 'Q')
+            {
+                do
+                {
+                    Console.Clear();
+                    Console.Write(Menu());
+                    Console.WriteLine(opcio);
+                    opcio = Console.ReadKey().KeyChar;
+                }
+                while (!(opcio > '0' && opcio < '7' || opcio == 'q' || opcio == 'Q'));
+                Console.Clear();
+                MostrarOpcio(opcio);
+                
+            }
+
         }
-        static void Menu()
+
+        static void MostrarOpcio(char opcio)
         {
-            
-            char opcio = ' ';
+
+        }
+        static string Menu()
+        {
             Console.Clear();
             string menu =
 
@@ -27,7 +47,13 @@
                $"\t\t\t\t\t ╚════════════════════════════════╝" +
                $"\n\n" + "Prem el botó per seleccionar la opció desitjada";
 
-            Console.WriteLine(menu);
+            return menu;
+
+        }
+
+        static void DonarAlta()
+        {
+
         }
     }
 }
