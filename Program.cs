@@ -1,9 +1,12 @@
-﻿namespace Agenda
+﻿using System.Linq.Expressions;
+
+namespace Agenda
 {
     internal class Program
     {
         static void Main(string[] args)
         {
+<<<<<<< HEAD
             string opcio = "";
             while (opcio != "Q" || opcio != "q")
             {
@@ -16,6 +19,32 @@
         {
             
             string opcio = "";
+=======
+            char opcio = '0';
+            while (opcio != 'q' && opcio != 'Q')
+            {
+                do
+                {
+                    Console.Clear();
+                    Console.Write(Menu());
+                    Console.WriteLine(opcio);
+                    opcio = Console.ReadKey().KeyChar;
+                }
+                while (!(opcio > '0' && opcio < '7' || opcio == 'q' || opcio == 'Q'));
+                Console.Clear();
+                MostrarOpcio(opcio);
+                
+            }
+
+        }
+
+        static void MostrarOpcio(char opcio)
+        {
+
+        }
+        static string Menu()
+        {
+>>>>>>> 4cf5c3f7b0cddca9e1f13980fdf6d44331806b92
             Console.Clear();
             string menu =
 
@@ -33,6 +62,7 @@
                $"\t\t\t\t\t ╚════════════════════════════════╝" +
                $"\n\n" + "Prem el botó per seleccionar la opció desitjada";
 
+<<<<<<< HEAD
             Console.WriteLine(menu);
             Console.ReadLine();
             switch (opcio)
@@ -59,6 +89,15 @@
 
 
             return opcio;
+=======
+            return menu;
+
+        }
+
+        static void DonarAlta()
+        {
+
+>>>>>>> 4cf5c3f7b0cddca9e1f13980fdf6d44331806b92
         }
     }
 }
