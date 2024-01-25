@@ -57,8 +57,10 @@ namespace Agenda
                     DonarAlta();
                     break;
                 case '2':
+                    RecuperarUsuari();
                     break;
                 case '3':
+                    ModificarUsuari();
                     break;
                 case '4':
                     break;
@@ -74,16 +76,13 @@ namespace Agenda
             string nom, cognom1, cognom2, dni=" ", telefon, dataNaixement, correu, persona;
             int edat;
             Console.WriteLine("Escriu el teu nom:");
-            nom = Console.ReadLine();
-            nom = NomVerificat(nom);
+            nom = NomVerificat(Console.ReadLine());
             Console.Clear();
             Console.WriteLine("Escriu el teu cognom1:");
-            cognom1 = Console.ReadLine();
-            cognom1 = NomVerificat(cognom1);
+            cognom1 = NomVerificat(Console.ReadLine());
             Console.Clear();
             Console.WriteLine("Escriu el teu cognom2:");
-            cognom2 = Console.ReadLine();
-            cognom2 = NomVerificat(cognom2);
+            cognom2 = NomVerificat(Console.ReadLine());
             Console.Clear();
             dni = VerificaDni();
             telefon = VerificaTelefon();
@@ -107,8 +106,7 @@ namespace Agenda
         static string NomVerificat(string nom)
         {
             string res = "";
-            nom = nom.ToLower();
-            nom = nom.Trim();
+            nom = nom.ToLower().Trim();
             for (int i = 0; i < nom.Length; i++)
             {
                 if (char.IsLetter(nom[i]))
@@ -119,13 +117,43 @@ namespace Agenda
             res = res.Substring(0,1).ToUpper() + res.Substring(1);
             return res;
         }
+        static string VerificaDni()
+        {
+            string dni;
+            Console.Clear();
+            Console.WriteLine("Escriu un dni valid:");
+            dni = Console.ReadLine();
+            while (!DniValid(dni))
+            {
+                Console.Clear();
+                Console.WriteLine("El dni esta mal escrit, recorda que es format 123455678A");
+                Console.WriteLine("Escriu un dni valid:");
+                dni = Console.ReadLine();
+            }
+            return dni;
+        }
+        static bool DniValid(string dni)
+        {
 
+            string dniChars = "TRWAGMYFPDXBNJZSQVHLCKET";
+            Regex regexDni = new Regex("^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKET]$");
+            bool valid = regexDni.IsMatch(dni);
+            if (valid)
+            {
+                char c = dni[dni.Length - 1];
+                if (!(c == dniChars[Convert.ToInt32(dni.Substring(0, dni.Length - 1)) % 23]))
+                {
+                    valid = false;
+                }
+            }
+            return valid;
+        }
         static string VerificaTelefon()
         {
             string telefon = "";
             int aux = 0;
             Console.Clear();
-            Console.WriteLine("Escriu el teu telefon:");
+            Console.WriteLine("Escriu un telefon valid:");
             telefon = Console.ReadLine();
             int.TryParse(telefon, out aux);
             while(!(aux >= 100000000 && aux <= 999999999))
@@ -139,42 +167,12 @@ namespace Agenda
             telefon = aux.ToString();
             return telefon;
         }
-        static string VerificaDni()
-        {
-            string dni;
-            Console.Clear();
-            Console.WriteLine("Escriu el teu dni:");
-            dni = Console.ReadLine();
-            while (!DniValid(dni))
-            {
-                Console.Clear();
-                Console.WriteLine("El dni esta mal escrit, recorda que es format 123455678A");
-                Console.WriteLine("Escriu el teu dni:");
-                dni = Console.ReadLine();
-            }
-            return dni;
-        }
-        static bool DniValid(string dni)
-        {
-            
-            string dniChars = "TRWAGMYFPDXBNJZSQVHLCKET";
-            Regex regexDni = new Regex("^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKET]$");
-            bool valid = regexDni.IsMatch(dni);
-            if(valid)
-            {
-                char c = dni[dni.Length - 1];
-                if(!(c == dniChars[Convert.ToInt32(dni.Substring(0, dni.Length - 1)) % 23]))
-                {
-                    valid = false;
-                }
-            }
-            return valid;
-        }
+        
         static string VerificaDataNaixement(out DateTime resultat)
         {
             string datanaixement;
             Console.Clear();
-            Console.WriteLine("Escriu la teva data de naixement:");
+            Console.WriteLine("Escriu una data de naixement valida:");
             datanaixement = Console.ReadLine();
             DateTime.TryParse(datanaixement, out resultat);
             while(resultat == DateTime.MinValue || resultat >= DateTime.Today)
@@ -192,7 +190,7 @@ namespace Agenda
         {
             string correu;
             Console.Clear();
-            Console.WriteLine("Escriu el teu correu electronic:");
+            Console.WriteLine("Escriu un correu electronic valid:");
             correu = Console.ReadLine();
             while (!Regex.IsMatch(correu, @"^[a-zA-Z0-9._%-]{3,}@[a-zA-Z]{3,}\.(com||es)$"))
             {
@@ -220,27 +218,206 @@ namespace Agenda
         // Recuperar Usuari
         static void RecuperarUsuari()
         {
-            Console.WriteLine("Digues el nom de quin usuari vols recuperar:");
-            string nom = Console.ReadLine();
-            while (UsuariTrobat(nom))
+            string nom, res;
+            char continuar;
+            do
             {
-
+                Console.WriteLine("Digues el nom del usuari que vols recuperar:");
+                nom = Console.ReadLine().Trim();
+                res = "";
+                continuar = 'N';
+                if (nom.EndsWith('*'))
+                {
+                    nom = NomVerificat(nom);
+                    res = UsuarisTrobatsAsterisc(nom);
+                }
+                else
+                {
+                    nom = NomVerificat(nom);
+                    res = UsuariTrobat(nom);
+                }
+                if(res == "0")
+                {
+                    do
+                    {
+                        Console.Clear();
+                        Console.WriteLine($"No s'ha trobat l'usuari amb el nom {nom}\nVols buscar un altre(S/N)?");
+                        continuar = Convert.ToChar(Console.ReadLine()[0]);
+                    }
+                    while (continuar != 'N' && continuar != 'S');
+                }
             }
+            while (continuar == 'S');
+            Console.WriteLine(res);
+            Thread.Sleep(10000);
         }
-        static bool UsuariTrobat(string nom)
+        static string UsuariTrobat(string nom)
         {
-            bool trobat = false;    
+            string res = "0", linia;
             StreamReader sr = new StreamReader(@".\agenda.txt");
-            if (nom.EndsWith('*'))
+            while(!sr.EndOfStream && res == "0")
             {
-                nom = nom.Substring(0, nom.Length - 1);
-                
+                linia = sr.ReadLine();
+                if(nom == linia.Substring(0,linia.IndexOf(',')))
+                    res = linia;
             }
-            return trobat;
+            sr.Close();
+            return res;
+        }
+        static string UsuarisTrobatsAsterisc(string nom)
+        {
+            string res = "0", linia;
+            StreamReader sr = new StreamReader(@".\agenda.txt");
+            while (!sr.EndOfStream)
+            {
+                linia = sr.ReadLine();
+                if (linia.Substring(0, linia.IndexOf(',')).StartsWith(nom))
+                {
+                    if (res == "0")
+                        res = linia;
+                    else res += $"\n{linia}";
+                }
+            }
+            sr.Close();
+            return res;
         }
         static void ModificarUsuari()
         {
-
+            string nom, modificacio, linia;
+            char continuar = 'S';
+            //Troba usuari
+            Console.WriteLine("Digues el nom del usuari que vols modificar:");
+            nom = NomVerificat(Console.ReadLine());
+            linia = UsuariTrobat(nom);
+            while (linia == "0")
+            {
+                Console.WriteLine($"No s'ha trobat l'usuari amb nom: {nom}");
+                Console.WriteLine("Digues el nom del usuari que vols modificar:");
+                nom = NomVerificat(Console.ReadLine());
+                linia = UsuariTrobat(nom);
+            }
+            do
+            {
+                //Troba que vols modificar
+                Console.Clear();
+                Console.WriteLine("Les dades del usuari són les següents:");
+                Console.WriteLine("(nom,cognom1,cognom2,dni,telefon,data de naixement,correu)");
+                Console.WriteLine(linia);
+                Console.WriteLine("Digues quina dada vols modificar");
+                modificacio = Console.ReadLine();
+                while(TrobarNumDada(modificacio) == -1)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Dada no valida, escriu una de les següents:");
+                    Console.WriteLine("(nom,cognom1,cognom2,dni,telefon,data de naixement,correu)");
+                    Console.WriteLine(linia);
+                    Console.WriteLine("Digues quina dada vols modificar");
+                    modificacio = Console.ReadLine();
+                }
+                int i = TrobarNumDada(modificacio);
+                ModificarDadaUsuari(linia,i);
+                Console.WriteLine("Vols seguir modificant aquest usuari(S/N)?");
+                Console.WriteLine($"Usuari: {linia}");
+                continuar = Convert.ToChar(Console.ReadLine()[0]);
+            }
+            while (continuar == 'S');
+        }
+        static int TrobarNumDada(string nomDada)
+        {
+            int num = -1;
+            nomDada = nomDada.Trim().ToLower();
+            switch (nomDada)
+            {
+                case "nom":
+                    num = 0;
+                    break;
+                case "cognom1":
+                    num = 1;
+                    break;
+                case "cognom2":
+                    num = 2;
+                    break;
+                case "dni":
+                    num = 3;
+                    break;
+                case "data de naixement":
+                    num = 4;
+                    break;
+                case "correu":
+                    num = 5;
+                    break;
+                default:
+                    num = -1; 
+                    break;
+            }
+            return num;
+        }
+        static void ModificarDadaUsuari(string liniaUsuari, int posModificacio)
+        {
+            StreamReader sr = new StreamReader(@".\agenda.txt");
+            StreamWriter sw = new StreamWriter(@".\aux.txt");
+            string liniaActual = sr.ReadLine();
+            string novaDada = "";
+            while(liniaActual != liniaUsuari) 
+            {
+                sw.WriteLine(liniaActual);
+                liniaActual = sr.ReadLine();
+            }
+            if( liniaActual == liniaUsuari) //Es redundant pero en cas que hi hagi algun error inesperat no hi entra
+            {
+                switch (posModificacio)
+                {
+                    case 0:
+                        Console.WriteLine("Escriu un nom valid:");
+                        novaDada = NomVerificat(Console.ReadLine());
+                        break;
+                    case 1:
+                        Console.WriteLine("Escriu un cognom1 valid:");
+                        novaDada = NomVerificat(Console.ReadLine());
+                        break;
+                    case 2:
+                        Console.WriteLine("Escriu un cognom2 valid:");
+                        novaDada = NomVerificat(Console.ReadLine());
+                        break;
+                    case 3:
+                        novaDada = VerificaDni();
+                        break;
+                    case 4:
+                        novaDada = VerificaTelefon();
+                        break;
+                    case 5:
+                        novaDada = VerificaDataNaixement(out DateTime resultat);
+                        break;
+                    case 6:
+                        novaDada = VerificaCorreu();
+                        break;
+                    default:
+                        throw new Exception("Hi ha algun error amb la posicio de la modificacio");
+                        break;
+                }
+                string liniaAnterior, liniaPosterior;
+                liniaActual = "";
+                for (int i = 0; i < posModificacio; i++)
+                {
+                    liniaActual += liniaUsuari.Substring(0, liniaUsuari.IndexOf(',')+1);
+                    liniaUsuari = liniaUsuari.Substring(liniaUsuari.IndexOf(',') + 1);
+                }
+                if(posModificacio != 6)
+                    liniaUsuari = liniaUsuari.Substring(liniaUsuari.IndexOf(',') + 1);
+                liniaActual += $"{novaDada},{liniaUsuari}";
+            }
+            while (!sr.EndOfStream)
+            {
+                sw.WriteLine(liniaActual);
+                liniaActual = sr.ReadLine();
+            }
+            sr.Close();
+            sw.Close();
+            sr = new StreamReader(@".\aux.txt");
+            sw = new StreamWriter(@".\agenda.txt");
+            sw.Write(sr.ReadToEnd());
+            sr.Close();
+            sw.Close();
         }
         static void EliminarUsuari()
         {
