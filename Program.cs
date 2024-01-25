@@ -26,7 +26,7 @@ namespace Agenda
 
         }
 
-       
+        // MENU
         static string Menu()
         {
             Console.Clear();
@@ -68,11 +68,11 @@ namespace Agenda
                     break;
             }
         }
-
+        // Donar Alta 
         static void DonarAlta()
         {
-            string nom, cognom1, cognom2, dni, telefon, correu, aux;
-            DateTime dataNaixament;
+            string nom, cognom1, cognom2, dni=" ", telefon, dataNaixement, correu, persona;
+            int edat;
             Console.WriteLine("Escriu el teu nom:");
             nom = Console.ReadLine();
             nom = NomVerificat(nom);
@@ -85,23 +85,25 @@ namespace Agenda
             cognom2 = Console.ReadLine();
             cognom2 = NomVerificat(cognom2);
             Console.Clear();
-            //DNI
-
-
-
+            dni = VerificaDni();
             telefon = VerificaTelefon();
-            dataNaixament = VerificaDataNaixament();
+            DateTime dateNaixement;
+            dataNaixement = VerificaDataNaixement(out dateNaixement);
             correu = VerificaCorreu();
-
-            do {
-                Console.WriteLine("Escriu el teu nom:");
-                nom = Console.ReadLine();
-
-            } 
-            while (nom != null);
-            
+            persona = $"{nom},{cognom1},{cognom2},{dni},{telefon},{dataNaixement},{correu}";
+            EscriuUsuariFitxer(persona);
+            Console.Clear();
+            Console.WriteLine($"Nom: {nom}\tCognom1: {cognom1}\tCognom2: {cognom2}\nDni: {dni}\tTelefon: {telefon}\nData naixement: {dataNaixement}\tEdat: {CalcularEdat(dateNaixement)} anys\nCorreu: {correu}");
+            Thread.Sleep(3000);
         }
-
+        static int CalcularEdat(DateTime dataNaixement)
+            {
+                DateTime dataActual = DateTime.Now;
+                int edat = dataActual.Year - dataNaixement.Year;
+                if ((dataNaixement.Month > dataActual.Month) || (dataNaixement.Month == dataActual.Month && dataNaixement.Day > dataActual.Day))
+                    edat--;
+                return edat;
+            }
         static string NomVerificat(string nom)
         {
             string res = "";
@@ -112,9 +114,9 @@ namespace Agenda
                 if (char.IsLetter(nom[i]))
                 {
                     res += nom[i];
-                    if(res.Length == 1) res.ToUpper();
                 }
             }
+            res = res.Substring(0,1).ToUpper() + res.Substring(1);
             return res;
         }
 
@@ -137,24 +139,54 @@ namespace Agenda
             telefon = aux.ToString();
             return telefon;
         }
-
-        static DateTime VerificaDataNaixament()
+        static string VerificaDni()
         {
-            string datanaixament;
-            DateTime resultat;
+            string dni;
             Console.Clear();
-            Console.WriteLine("Escriu la teva data de naixament:");
-            datanaixament = Console.ReadLine();
-            DateTime.TryParse(datanaixament, out resultat);
+            Console.WriteLine("Escriu el teu dni:");
+            dni = Console.ReadLine();
+            while (!DniValid(dni))
+            {
+                Console.Clear();
+                Console.WriteLine("El dni esta mal escrit, recorda que es format 123455678A");
+                Console.WriteLine("Escriu el teu dni:");
+                dni = Console.ReadLine();
+            }
+            return dni;
+        }
+        static bool DniValid(string dni)
+        {
+            
+            string dniChars = "TRWAGMYFPDXBNJZSQVHLCKET";
+            Regex regexDni = new Regex("^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKET]$");
+            bool valid = regexDni.IsMatch(dni);
+            if(valid)
+            {
+                char c = dni[dni.Length - 1];
+                if(!(c == dniChars[Convert.ToInt32(dni.Substring(0, dni.Length - 1)) % 23]))
+                {
+                    valid = false;
+                }
+            }
+            return valid;
+        }
+        static string VerificaDataNaixement(out DateTime resultat)
+        {
+            string datanaixement;
+            Console.Clear();
+            Console.WriteLine("Escriu la teva data de naixement:");
+            datanaixement = Console.ReadLine();
+            DateTime.TryParse(datanaixement, out resultat);
             while(resultat == DateTime.MinValue || resultat >= DateTime.Today)
             {
                 Console.Clear();
                 Console.WriteLine("La data esta mal escrita, ha de ser un format DateTime valid");
                 Console.WriteLine("Prova a escriure la data una altra vegada");
-                datanaixament = Console.ReadLine();
-                DateTime.TryParse(datanaixament, out resultat);
+                datanaixement = Console.ReadLine();
+                DateTime.TryParse(datanaixement, out resultat);
             }
-            return resultat;
+            //datanaixament = resultat.Date.ToString("d");
+            return resultat.Date.ToString("d");
         }
         static string VerificaCorreu()
         {
@@ -162,20 +194,49 @@ namespace Agenda
             Console.Clear();
             Console.WriteLine("Escriu el teu correu electronic:");
             correu = Console.ReadLine();
-            while (Regex.IsMatch(correu, @"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"))
+            while (!Regex.IsMatch(correu, @"^[a-zA-Z0-9._%-]{3,}@[a-zA-Z]{3,}\.(com||es)$"))
             {
                 Console.Clear();
                 Console.WriteLine("El correu esta mal escrit");
                 Console.WriteLine("Prova a escriure el correu una altra vegada");
                 correu = Console.ReadLine();
             }
-            return correu;
+            return correu.ToLower();
         }
-        
-
+        static void EscriuUsuariFitxer(string persona)
+        {
+            StreamReader sr = new StreamReader(@".\agenda.txt");
+            StreamWriter sw = new StreamWriter(@".\aux.txt");
+            sw.Write(sr.ReadToEnd());
+            sr.Close();
+            sw.Write(persona);
+            sw.Close();
+            sr = new StreamReader(@".\aux.txt");
+            sw = new StreamWriter(@".\agenda.txt");
+            sw.WriteLine(sr.ReadToEnd());
+            sr.Close();
+            sw.Close();
+        }
+        // Recuperar Usuari
         static void RecuperarUsuari()
         {
+            Console.WriteLine("Digues el nom de quin usuari vols recuperar:");
+            string nom = Console.ReadLine();
+            while (UsuariTrobat(nom))
+            {
 
+            }
+        }
+        static bool UsuariTrobat(string nom)
+        {
+            bool trobat = false;    
+            StreamReader sr = new StreamReader(@".\agenda.txt");
+            if (nom.EndsWith('*'))
+            {
+                nom = nom.Substring(0, nom.Length - 1);
+                
+            }
+            return trobat;
         }
         static void ModificarUsuari()
         {
