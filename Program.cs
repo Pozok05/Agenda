@@ -1,6 +1,8 @@
 ﻿using System.Linq.Expressions;
+using System.Net;
 using System.Runtime.Intrinsics.X86;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Agenda
 {
@@ -92,8 +94,9 @@ namespace Agenda
             persona = $"{nom},{cognom1},{cognom2},{dni},{telefon},{dataNaixement},{correu}";
             EscriuUsuariFitxer(persona);
             Console.Clear();
-            Console.WriteLine($"Nom: {nom}\tCognom1: {cognom1}\tCognom2: {cognom2}\nDni: {dni}\tTelefon: {telefon}\nData naixement: {dataNaixement}\tEdat: {CalcularEdat(dateNaixement)} anys\nCorreu: {correu}");
-            Thread.Sleep(3000);
+            Console.WriteLine(UsuariAmigable(persona));
+            //Console.WriteLine($"Nom: {nom}\tCognom1: {cognom1}\tCognom2: {cognom2}\nDni: {dni}\tTelefon: {telefon}\nData naixement: {dataNaixement}\tEdat: {CalcularEdat(dateNaixement)} anys\nCorreu: {correu}");
+            Thread.Sleep(30000);
         }
         static int CalcularEdat(DateTime dataNaixement)
             {
@@ -114,7 +117,8 @@ namespace Agenda
                     res += nom[i];
                 }
             }
-            res = res.Substring(0,1).ToUpper() + res.Substring(1);
+            if(res.Length != 0)
+                res = res.Substring(0,1).ToUpper() + res.Substring(1);               
             return res;
         }
         static string VerificaDni()
@@ -218,14 +222,16 @@ namespace Agenda
         // Recuperar Usuari
         static void RecuperarUsuari()
         {
-            string nom, res;
-            char continuar;
+            string nom, res, pregunta;
+            //char continuar;
             do
             {
+                Console.Clear();
                 Console.WriteLine("Digues el nom del usuari que vols recuperar:");
                 nom = Console.ReadLine().Trim();
                 res = "";
-                continuar = 'N';
+                pregunta = "";
+                //continuar = 'N';
                 if (nom.EndsWith('*'))
                 {
                     nom = NomVerificat(nom);
@@ -238,18 +244,29 @@ namespace Agenda
                 }
                 if(res == "0")
                 {
-                    do
-                    {
-                        Console.Clear();
-                        Console.WriteLine($"No s'ha trobat l'usuari amb el nom {nom}\nVols buscar un altre(S/N)?");
-                        continuar = Convert.ToChar(Console.ReadLine()[0]);
-                    }
-                    while (continuar != 'N' && continuar != 'S');
+                    pregunta = $"No s'ha trobat l'usuari amb el nom {nom}\n";
+                    //do
+                    //{
+                    //    Console.Clear();
+                    //    Console.WriteLine($"No s'ha trobat l'usuari amb el nom {nom}\nVols buscar un altre(S/N)?");
+                    //    continuar = Convert.ToChar(Console.ReadLine()[0]);
+                    //}
+                    //while (continuar != 'N' && continuar != 'S');
                 }
+                else
+                {
+                    while (res.Contains($"\n"))
+                    {
+                        Console.WriteLine(UsuariAmigable(res.Substring(0,res.IndexOf($"\n"))));
+                        res = res.Substring(res.IndexOf($"\n") + 1);
+                    }
+                    Console.WriteLine(UsuariAmigable(res));
+                    Thread.Sleep(10000);
+                }
+                pregunta += "Vols buscar un altre?";
+
             }
-            while (continuar == 'S');
-            Console.WriteLine(res);
-            Thread.Sleep(10000);
+            while (PreguntaContinuar(pregunta));
         }
         static string UsuariTrobat(string nom)
         {
@@ -281,9 +298,47 @@ namespace Agenda
             sr.Close();
             return res;
         }
+        //Es fa servir per mostrar de forma amigable
+        static string UsuariAmigable(string linia)
+        {
+            string s = "";
+            string[] titols = ["Nom", "Cognom1", "Cognom2", "Dni", "Telefon", "Data de naixament", "Edat", "Correu"];
+            for(int i = 0; i < 6; i++)
+            {
+                s += $"{titols[i]}: {linia.Substring(0, linia.IndexOf(","))} \t";
+                if (i > 0 && i % 2 == 0) // Ves fent intros pq quedi bonic
+                    s += "\n";
+                if(i != 5)
+                    linia = linia.Substring(linia.IndexOf(",") + 1);
+            }
+            /*int[] dates = new int[3];
+            dates[0] = Convert.ToInt32(linia.Substring(0, linia.IndexOf("/")));
+            linia = linia.Substring(linia.IndexOf("/") + 1);
+            dates[1] = Convert.ToInt32(linia.Substring(0, linia.IndexOf("/")));
+            linia = linia.Substring(linia.IndexOf("/") + 1);
+            dates[2] = Convert.ToInt32(linia.Substring(0, linia.IndexOf("/")));
+            linia = linia.Substring(linia.IndexOf("/") + 1);
+            s += $"{titols[6]}: {CalcularEdat(new DateTime(dates[0], dates[1], dates[2]))}";
+            */
+            s += $"{titols[6]}: {CalcularEdat(StringDataNaixementToDateTime(linia))}\n";
+            linia = linia.Substring(linia.IndexOf(",") + 1);
+            s += $"{titols[7]}: {linia}";
+            return s;
+        }
+        static DateTime StringDataNaixementToDateTime(string linia)
+        {
+            int[] dates = new int[3];
+            dates[0] = Convert.ToInt32(linia.Substring(0, linia.IndexOf(@"/")));
+            linia = linia.Substring(linia.IndexOf(@"/") + 1);
+            dates[1] = Convert.ToInt32(linia.Substring(0, linia.IndexOf(@"/")));
+            linia = linia.Substring(linia.IndexOf(@"/") + 1);
+            dates[2] = Convert.ToInt32(linia.Substring(0, linia.IndexOf(",")));
+
+            return new DateTime(dates[2], dates[1], dates[0]);
+        }
         static void ModificarUsuari()
         {
-            string nom, modificacio, linia;
+            string nom, modificacio, linia, pregunta;
             char continuar = 'S';
             //Troba usuari
             Console.WriteLine("Digues el nom del usuari que vols modificar:");
@@ -302,7 +357,7 @@ namespace Agenda
                 Console.Clear();
                 Console.WriteLine("Les dades del usuari són les següents:");
                 Console.WriteLine("(nom,cognom1,cognom2,dni,telefon,data de naixement,correu)");
-                Console.WriteLine(linia);
+                Console.WriteLine(UsuariAmigable(linia));
                 Console.WriteLine("Digues quina dada vols modificar");
                 modificacio = Console.ReadLine();
                 while(TrobarNumDada(modificacio) == -1)
@@ -310,17 +365,18 @@ namespace Agenda
                     Console.Clear();
                     Console.WriteLine("Dada no valida, escriu una de les següents:");
                     Console.WriteLine("(nom,cognom1,cognom2,dni,telefon,data de naixement,correu)");
-                    Console.WriteLine(linia);
+                    Console.WriteLine($"Usuari: \n{UsuariAmigable(linia)}");
                     Console.WriteLine("Digues quina dada vols modificar");
                     modificacio = Console.ReadLine();
                 }
                 int i = TrobarNumDada(modificacio);
-                ModificarDadaUsuari(linia,i);
-                Console.WriteLine("Vols seguir modificant aquest usuari(S/N)?");
-                Console.WriteLine($"Usuari: {linia}");
-                continuar = Convert.ToChar(Console.ReadLine()[0]);
+                ModificarDadaUsuari(ref linia,i);
+                pregunta = $"Vols seguir modificant aquest usuari? \nUsuari: \n{UsuariAmigable(linia)}";
+                //Console.WriteLine("Vols seguir modificant aquest usuari(S/N)?");
+                //Console.WriteLine($"Usuari: \n{UsuariAmigable(linia)}");
+                //continuar = Convert.ToChar(Console.ReadLine()[0]);
             }
-            while (continuar == 'S');
+            while (PreguntaContinuar(pregunta));
         }
         static int TrobarNumDada(string nomDada)
         {
@@ -340,11 +396,14 @@ namespace Agenda
                 case "dni":
                     num = 3;
                     break;
-                case "data de naixement":
+                case "telefon":
                     num = 4;
                     break;
-                case "correu":
+                case "data de naixement":
                     num = 5;
+                    break;
+                case "correu":
+                    num = 6;
                     break;
                 default:
                     num = -1; 
@@ -352,7 +411,7 @@ namespace Agenda
             }
             return num;
         }
-        static void ModificarDadaUsuari(string liniaUsuari, int posModificacio)
+        static void ModificarDadaUsuari(ref string liniaUsuari, int posModificacio)
         {
             StreamReader sr = new StreamReader(@".\agenda.txt");
             StreamWriter sw = new StreamWriter(@".\aux.txt");
@@ -405,6 +464,7 @@ namespace Agenda
                 if(posModificacio != 6)
                     liniaUsuari = liniaUsuari.Substring(liniaUsuari.IndexOf(',') + 1);
                 liniaActual += $"{novaDada},{liniaUsuari}";
+                liniaUsuari = liniaActual;
             }
             while (!sr.EndOfStream)
             {
@@ -418,7 +478,24 @@ namespace Agenda
             sw.Write(sr.ReadToEnd());
             sr.Close();
             sw.Close();
+            
         }
+        static bool PreguntaContinuar(string pregunta)
+        {
+            char opcio = ' ';
+            Console.Clear();
+            Console.WriteLine($"Respon amb S o N\n{pregunta}");
+            opcio = Convert.ToChar(Console.ReadLine()[0]);
+            while (opcio != 'N' && opcio != 'S' && opcio != 'n' && opcio != 's')
+            {
+                Console.Clear();
+                Console.WriteLine("No has escrit be, respon amb S o N");
+                Console.WriteLine(pregunta);
+                opcio = Convert.ToChar(Console.ReadLine()[0]);
+            }
+            return (opcio == 'S' || opcio == 's');
+        }
+
         static void EliminarUsuari()
         {
 
