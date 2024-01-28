@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Globalization;
+using System.Linq.Expressions;
 using System.Net;
 using System.Runtime.Intrinsics.X86;
 using System.Text.RegularExpressions;
@@ -16,16 +17,14 @@ namespace Agenda
                 do
                 {
                     Console.Clear();
-                    Console.Write(Menu());
-                    Console.WriteLine(opcio);
+                    PintarMenu(Menu());
                     opcio = Console.ReadKey().KeyChar;
                 }
                 while (!(opcio > '0' && opcio < '7' || opcio == 'q' || opcio == 'Q'));
                 Console.Clear();
                 MostrarOpcio(opcio);
-                
             }
-
+            
         }
 
         // MENU
@@ -33,23 +32,42 @@ namespace Agenda
         {
             Console.Clear();
             string menu =
-
-               $" \n \n " +
-               $"\t\t\t\t\t ╔════════════════════════════════╗ \n" +
-               $"\t\t\t\t\t ║      GESTIO D'UNA AGENDA       ║ \n" +
-               $"\t\t\t\t\t ╠════════════════════════════════╣ \n" +
-               $"\t\t\t\t\t ║  1 - Donar d’alta usuari       ║ \n" +
-               $"\t\t\t\t\t ║  2 - Recuperar usuari          ║ \n" +
-               $"\t\t\t\t\t ║  3 - Modificar usuari          ║ \n" +
-               $"\t\t\t\t\t ║  4 - Eliminar usuari           ║ \n" +
-               $"\t\t\t\t\t ║  5 - Mostrar agenda            ║ \n" +
-               $"\t\t\t\t\t ║  6 - Ordenar agenda            ║ \n" +
-               $"\t\t\t\t\t ║  Q - exit                      ║ \n" +
-               $"\t\t\t\t\t ╚════════════════════════════════╝" +
-               $"\n\n" + "Prem el botó per seleccionar la opció desitjada";
-
+               $"\n\n" +
+               $" ╔════════════════════════════════╗ \n" +
+               $" ║      GESTIO D'UNA AGENDA       ║ \n" +
+               $" ╠════════════════════════════════╣ \n" +
+               $" ║  1 - Donar d’alta usuari       ║ \n" +
+               $" ║  2 - Recuperar usuari          ║ \n" +
+               $" ║  3 - Modificar usuari          ║ \n" +
+               $" ║  4 - Eliminar usuari           ║ \n" +
+               $" ║  5 - Mostrar agenda            ║ \n" +
+               $" ║  6 - Ordenar agenda            ║ \n" +
+               $" ║  Q - exit                      ║ \n" +
+               $" ╚════════════════════════════════╝ " +
+               $"\n\n" + "Prem el botó per seleccionar la opció desitjada:";
             return menu;
-
+        }
+        // Mètode PintarMenu
+        static void PintarMenu(string menu)
+        {
+            string linea = "", text = menu;
+            while (text.Contains("\n"))
+            {
+                linea = text.Substring(0, text.IndexOf("\n"));
+                Centrar(linea);
+                text = text.Substring(text.IndexOf("\n") + 1);
+            }
+            Centrar(text);
+        }
+        // Mètode Centrar
+        static void Centrar(string text)
+        {
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write(string.Format("{0," + ((Console.WindowWidth / 2) - (text.Length / 2) - 1) + "}", ""));
+            Console.BackgroundColor = ConsoleColor.DarkMagenta;
+            Console.Write(string.Format($"{text}"));
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.WriteLine();
         }
         static void MostrarOpcio(char opcio)
         {
@@ -65,10 +83,13 @@ namespace Agenda
                     ModificarUsuari();
                     break;
                 case '4':
+                    EliminarUsuari();
                     break;
                 case '5':
+                    MostrarAgenda();
                     break;
                 case '6':
+                    OrdenarAgenda();
                     break;
             }
         }
@@ -96,7 +117,7 @@ namespace Agenda
             Console.Clear();
             Console.WriteLine(UsuariAmigable(persona));
             //Console.WriteLine($"Nom: {nom}\tCognom1: {cognom1}\tCognom2: {cognom2}\nDni: {dni}\tTelefon: {telefon}\nData naixement: {dataNaixement}\tEdat: {CalcularEdat(dateNaixement)} anys\nCorreu: {correu}");
-            Thread.Sleep(30000);
+            Espera(5);
         }
         static int CalcularEdat(DateTime dataNaixement)
             {
@@ -207,15 +228,11 @@ namespace Agenda
         }
         static void EscriuUsuariFitxer(string persona)
         {
-            StreamReader sr = new StreamReader(@".\agenda.txt");
-            StreamWriter sw = new StreamWriter(@".\aux.txt");
+            CopiarAgendaToAux();
+            StreamReader sr = new StreamReader(@".\aux.txt");
+            StreamWriter sw = new StreamWriter(@".\agenda.txt");
             sw.Write(sr.ReadToEnd());
-            sr.Close();
-            sw.Write(persona);
-            sw.Close();
-            sr = new StreamReader(@".\aux.txt");
-            sw = new StreamWriter(@".\agenda.txt");
-            sw.WriteLine(sr.ReadToEnd());
+            sw.WriteLine(persona);
             sr.Close();
             sw.Close();
         }
@@ -261,7 +278,7 @@ namespace Agenda
                         res = res.Substring(res.IndexOf($"\n") + 1);
                     }
                     Console.WriteLine(UsuariAmigable(res));
-                    Thread.Sleep(10000);
+                    Espera(5);
                 }
                 pregunta += "Vols buscar un altre?";
 
@@ -302,14 +319,13 @@ namespace Agenda
         static string UsuariAmigable(string linia)
         {
             string s = "";
-            string[] titols = ["Nom", "Cognom1", "Cognom2", "Dni", "Telefon", "Data de naixament", "Edat", "Correu"];
-            for(int i = 0; i < 6; i++)
+            string[] titols = ["Nom", "Cognom1", "Cognom2", "Dni", "Telefon", "Data de naixement", "Edat", "Correu"];
+            for(int i = 0; i < 5; i++)
             {
                 s += $"{titols[i]}: {linia.Substring(0, linia.IndexOf(","))} \t";
                 if (i > 0 && i % 2 == 0) // Ves fent intros pq quedi bonic
                     s += "\n";
-                if(i != 5)
-                    linia = linia.Substring(linia.IndexOf(",") + 1);
+                linia = linia.Substring(linia.IndexOf(",") + 1);
             }
             /*int[] dates = new int[3];
             dates[0] = Convert.ToInt32(linia.Substring(0, linia.IndexOf("/")));
@@ -320,7 +336,9 @@ namespace Agenda
             linia = linia.Substring(linia.IndexOf("/") + 1);
             s += $"{titols[6]}: {CalcularEdat(new DateTime(dates[0], dates[1], dates[2]))}";
             */
-            s += $"{titols[6]}: {CalcularEdat(StringDataNaixementToDateTime(linia))}\n";
+            DateTime data = StringDataNaixementToDateTime(linia.Substring(0, linia.IndexOf(",")));
+            s += $"{titols[5]}: {data.ToString("dddd, dd MMMM yyyy", new CultureInfo("ca-ES"))}\t";
+            s += $"{titols[6]}: {CalcularEdat(data)} anys\n";
             linia = linia.Substring(linia.IndexOf(",") + 1);
             s += $"{titols[7]}: {linia}";
             return s;
@@ -332,7 +350,7 @@ namespace Agenda
             linia = linia.Substring(linia.IndexOf(@"/") + 1);
             dates[1] = Convert.ToInt32(linia.Substring(0, linia.IndexOf(@"/")));
             linia = linia.Substring(linia.IndexOf(@"/") + 1);
-            dates[2] = Convert.ToInt32(linia.Substring(0, linia.IndexOf(",")));
+            dates[2] = Convert.ToInt32(linia.Substring(0));
 
             return new DateTime(dates[2], dates[1], dates[0]);
         }
@@ -370,6 +388,8 @@ namespace Agenda
                     modificacio = Console.ReadLine();
                 }
                 int i = TrobarNumDada(modificacio);
+                //Console.WriteLine(i);
+                //string x = Console.ReadLine();
                 ModificarDadaUsuari(ref linia,i);
                 pregunta = $"Vols seguir modificant aquest usuari? \nUsuari: \n{UsuariAmigable(linia)}";
                 //Console.WriteLine("Vols seguir modificant aquest usuari(S/N)?");
@@ -413,8 +433,9 @@ namespace Agenda
         }
         static void ModificarDadaUsuari(ref string liniaUsuari, int posModificacio)
         {
-            StreamReader sr = new StreamReader(@".\agenda.txt");
-            StreamWriter sw = new StreamWriter(@".\aux.txt");
+            CopiarAgendaToAux();
+            StreamReader sr = new StreamReader(@".\aux.txt");
+            StreamWriter sw = new StreamWriter(@".\agenda.txt");
             string liniaActual = sr.ReadLine();
             string novaDada = "";
             while(liniaActual != liniaUsuari) 
@@ -461,9 +482,13 @@ namespace Agenda
                     liniaActual += liniaUsuari.Substring(0, liniaUsuari.IndexOf(',')+1);
                     liniaUsuari = liniaUsuari.Substring(liniaUsuari.IndexOf(',') + 1);
                 }
-                if(posModificacio != 6)
+                if (posModificacio != 6)
+                {
                     liniaUsuari = liniaUsuari.Substring(liniaUsuari.IndexOf(',') + 1);
-                liniaActual += $"{novaDada},{liniaUsuari}";
+                    liniaActual += $"{novaDada},{liniaUsuari}";
+                }
+                else
+                    liniaActual += novaDada;
                 liniaUsuari = liniaActual;
             }
             while (!sr.EndOfStream)
@@ -471,14 +496,9 @@ namespace Agenda
                 sw.WriteLine(liniaActual);
                 liniaActual = sr.ReadLine();
             }
+            sw.WriteLine(liniaActual);
             sr.Close();
-            sw.Close();
-            sr = new StreamReader(@".\aux.txt");
-            sw = new StreamWriter(@".\agenda.txt");
-            sw.Write(sr.ReadToEnd());
-            sr.Close();
-            sw.Close();
-            
+            sw.Close();            
         }
         static bool PreguntaContinuar(string pregunta)
         {
@@ -498,16 +518,139 @@ namespace Agenda
 
         static void EliminarUsuari()
         {
-
+            string nom, modificacio, linia, pregunta;
+            char continuar = 'S';
+            //Troba usuari
+            Console.WriteLine("Digues el nom del usuari que vols eliminar:");
+            nom = NomVerificat(Console.ReadLine());
+            linia = UsuariTrobat(nom);
+            while (linia == "0")
+            {
+                Console.WriteLine($"No s'ha trobat l'usuari amb nom: {nom}");
+                Console.WriteLine("Digues el nom del usuari que vols eliminar:");
+                nom = NomVerificat(Console.ReadLine());
+                linia = UsuariTrobat(nom);
+            }
+            EliminarLinia(linia);
+        }
+        static void EliminarLinia(string linia)
+        {
+            CopiarAgendaToAux();
+            StreamReader sr = new StreamReader(@".\aux.txt");
+            StreamWriter sw = new StreamWriter(@".\agenda.txt");
+            string liniaActual = sr.ReadLine();
+            while (!sr.EndOfStream && linia != liniaActual)
+            {
+                sw.WriteLine(liniaActual);
+                liniaActual = sr.ReadLine();
+            }
+            liniaActual = sr.ReadLine();
+            while (!sr.EndOfStream)
+            {
+                sw.WriteLine(liniaActual);
+                liniaActual = sr.ReadLine();
+            }
+            sw.WriteLine(liniaActual);
+            sr.Close();
+            sw.Close();
+        }
+        static void CopiarAgendaToAux()
+        {
+            StreamReader sr = new StreamReader(@".\agenda.txt");
+            StreamWriter sw = new StreamWriter(@".\aux.txt");
+            sw.Write(sr.ReadToEnd());
+            sw.Close();
+            sr.Close();
         }
         static void MostrarAgenda()
         {
-
+            OrdenarAux();
+            StreamReader sr = new StreamReader(@".\aux.txt");
+            string nomstel = "";
+            Console.WriteLine("AGENDA\n");
+            while(!sr.EndOfStream)
+            {
+                nomstel = NomsTelefon(sr.ReadLine());
+                Console.Write(nomstel.Substring(0,nomstel.IndexOf("Tel:")));
+                Console.SetCursorPosition(45, Console.CursorTop);
+                Console.WriteLine(nomstel.Substring(nomstel.IndexOf("Tel:")));
+            }
+            sr.Close();
+            Espera(5);
+        }
+        static string NomsTelefon(string linia)
+        {
+            string nom, cognom1, cognom2, telefon;
+            nom = linia.Substring(0,linia.IndexOf(','));
+            linia = linia.Substring(linia.IndexOf(',') + 1);
+            cognom1 = linia.Substring(0, linia.IndexOf(','));
+            linia = linia.Substring(linia.IndexOf(',') + 1);
+            cognom2 = linia.Substring(0, linia.IndexOf(','));
+            linia = linia.Substring(linia.IndexOf(',') + 1);
+            linia = linia.Substring(linia.IndexOf(',') + 1);
+            telefon = linia.Substring(0, linia.IndexOf(','));
+            return $"Nom: {nom} {cognom1} {cognom2} Tel: {telefon}";
         }
         static void OrdenarAgenda()
         {
-
+            OrdenarAux();
+            StreamReader sr = new StreamReader(@".\aux.txt");
+            StreamWriter sw = new StreamWriter(@".\agenda.txt");
+            sw.WriteLine(sr.ReadToEnd());
+            sr.Close();
+            sw.Close();
+            Console.WriteLine("L'agenda s'ha ordenat correctament!");
+            Espera(5);
         }
-
+        static void OrdenarAux()
+        {
+            StreamReader sr;
+            StreamWriter sw = new StreamWriter(@".\aux.txt");
+            string liniaMenorAnt = ""; //Valor molt petit per a la taula ASCII
+            string liniaMenor = "zzzzzzz"; //Valor molt gran en la taula ASCII
+            string liniaActual;
+            bool acabat = false;
+            while (!acabat)
+            {
+                sr = new StreamReader(@".\agenda.txt");
+                liniaMenor = "zzzzzz";
+                while (!sr.EndOfStream)
+                {
+                    liniaActual = sr.ReadLine();
+                    if (liniaActual.CompareTo(liniaMenor) < 0 && liniaActual.CompareTo(liniaMenorAnt) > 0)
+                    {
+                        liniaMenor = liniaActual;
+                    }
+                }
+                sr.Close();
+                if (liniaMenor.Equals("zzzzzz"))
+                {
+                    acabat = true;
+                }
+                else
+                {
+                    sw.WriteLine(liniaMenor);
+                    liniaMenorAnt = liniaMenor;
+                }
+            }
+            sw.Close();
+        }
+        static void Espera(int segons)
+        {
+            Console.WriteLine("\nTornant al menu principal...");
+            for(int i = segons; i > 0; i--)
+            {
+                Console.WriteLine($"{i}s     "); //Els espais extra es perque quan passi de 10 a 9 segons no escrigui "9ss"
+                Thread.Sleep(1000);
+                NetejaLiniaActual();
+            }
+        }
+        static void NetejaLiniaActual()
+        {
+            int liniaActual = Console.CursorTop;
+            Console.SetCursorPosition(0, Console.CursorTop);
+            Console.Write(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, liniaActual - 1);
+        }
     }
 }
