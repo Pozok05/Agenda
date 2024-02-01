@@ -1,3 +1,0 @@
-nom,cognom1,cognom2,DNI,telefon,data de naixament,correu
-Sergi,Garcia,Manjarrez,447575137S,15/09/2001,a2308766@intitutmontilivi.cat
-Quim,Diaz,Iglesias,63795423B,13/04/2002,a2308768@institutmontilivi.cat
