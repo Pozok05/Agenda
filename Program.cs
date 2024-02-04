@@ -9,6 +9,7 @@ namespace Agenda
 {
     internal class Program
     {
+        // MAIN
         static void Main(string[] args)
         {
             char opcio = '0';
@@ -47,7 +48,7 @@ namespace Agenda
                $"\n\n" + "Prem el botó per seleccionar la opció desitjada:";
             return menu;
         }
-        // Mètode PintarMenu
+        // Metode PintarMenu
         static void PintarMenu(string menu)
         {
             string linea = "", text = menu;
@@ -59,7 +60,7 @@ namespace Agenda
             }
             Centrar(text);
         }
-        // Mètode Centrar
+        // Metode Centrar
         static void Centrar(string text)
         {
             Console.BackgroundColor = ConsoleColor.Black;
@@ -69,6 +70,7 @@ namespace Agenda
             Console.BackgroundColor = ConsoleColor.Black;
             Console.WriteLine();
         }
+        // Metode MostrarOpcio
         static void MostrarOpcio(char opcio)
         {
             switch (opcio)
@@ -116,9 +118,9 @@ namespace Agenda
             EscriuUsuariFitxer(persona);
             Console.Clear();
             Console.WriteLine(UsuariAmigable(persona));
-            //Console.WriteLine($"Nom: {nom}\tCognom1: {cognom1}\tCognom2: {cognom2}\nDni: {dni}\tTelefon: {telefon}\nData naixement: {dataNaixement}\tEdat: {CalcularEdat(dateNaixement)} anys\nCorreu: {correu}");
             Espera(5);
         }
+        // Metode CalcularEdat: A partir de un datetime retorna un int amb l'edat
         static int CalcularEdat(DateTime dataNaixement)
             {
                 DateTime dataActual = DateTime.Now;
@@ -127,6 +129,7 @@ namespace Agenda
                     edat--;
                 return edat;
             }
+        // Metode NomVerificat: Realment no verifica res, nomes esborra tot allo que no siguin lletres i posa la primera lletra a majus
         static string NomVerificat(string nom)
         {
             string res = "";
@@ -142,6 +145,7 @@ namespace Agenda
                 res = res.Substring(0,1).ToUpper() + res.Substring(1);               
             return res;
         }
+        // Metode VerificaDni: Demana per consola un dni i no acaba fins que el dni entrat es valid, retorna el dni en format string
         static string VerificaDni()
         {
             string dni;
@@ -157,6 +161,7 @@ namespace Agenda
             }
             return dni;
         }
+        // Metode DniValid: Retorna true si el dni entrat es valid, fals altrament
         static bool DniValid(string dni)
         {
 
@@ -173,6 +178,7 @@ namespace Agenda
             }
             return valid;
         }
+        // Metode VerificaTelefon: Demana per consola un telefon i no acaba fins que el telefon es valid, el retorna en fromat string
         static string VerificaTelefon()
         {
             string telefon = "";
@@ -192,7 +198,8 @@ namespace Agenda
             telefon = aux.ToString();
             return telefon;
         }
-        
+        // Metode VerificaDatanaixement: Demana per consola una data de naixement i no acaba fins que no acaba fins que la data es valida
+        // retorna en format string, encara que el parametre out resultat no s'utilitza en aquest programa, pero he pensat que podria ser util aixi que l'he deixat
         static string VerificaDataNaixement(out DateTime resultat)
         {
             string datanaixement;
@@ -208,9 +215,9 @@ namespace Agenda
                 datanaixement = Console.ReadLine();
                 DateTime.TryParse(datanaixement, out resultat);
             }
-            //datanaixament = resultat.Date.ToString("d");
             return resultat.Date.ToString("d");
         }
+        // Metode VerificaCorreu: Demana un correu per consola i no acaba fins que el correu es valid, fa servir un Regex
         static string VerificaCorreu()
         {
             string correu;
@@ -226,6 +233,7 @@ namespace Agenda
             }
             return correu.ToLower();
         }
+        // Metode EscriuUsuariFitxer: Escriu el string persona al fitxer agenda (al final de tot)
         static void EscriuUsuariFitxer(string persona)
         {
             CopiarAgendaToAux();
@@ -236,11 +244,10 @@ namespace Agenda
             sr.Close();
             sw.Close();
         }
-        // Recuperar Usuari
+        // Metode RecuperarUsuari: Opcio 2
         static void RecuperarUsuari()
         {
             string nom, res, pregunta;
-            //char continuar;
             do
             {
                 Console.Clear();
@@ -262,13 +269,6 @@ namespace Agenda
                 if(res == "0")
                 {
                     pregunta = $"No s'ha trobat l'usuari amb el nom {nom}\n";
-                    //do
-                    //{
-                    //    Console.Clear();
-                    //    Console.WriteLine($"No s'ha trobat l'usuari amb el nom {nom}\nVols buscar un altre(S/N)?");
-                    //    continuar = Convert.ToChar(Console.ReadLine()[0]);
-                    //}
-                    //while (continuar != 'N' && continuar != 'S');
                 }
                 else
                 {
@@ -285,6 +285,8 @@ namespace Agenda
             }
             while (PreguntaContinuar(pregunta));
         }
+        // Metode UsuariTrobat: Fa una cerca al fitxer agenda.txt per veure si troba el nom (string nom), en cas de trobar-lo retorna tota la linia
+        // de dades de la persona, altrament retorna "0"
         static string UsuariTrobat(string nom)
         {
             string res = "0", linia;
@@ -298,6 +300,7 @@ namespace Agenda
             sr.Close();
             return res;
         }
+        // Metode UsuarisTrobatsAsterisc: Fa el mateix que metode anterior pero retorna totes les linies que tinguin un nom que comenci per (string nom)
         static string UsuarisTrobatsAsterisc(string nom)
         {
             string res = "0", linia;
@@ -315,7 +318,7 @@ namespace Agenda
             sr.Close();
             return res;
         }
-        //Es fa servir per mostrar de forma amigable
+        // Metode UsuariAmigable: A partir d'una linia csv retorna un string amb totes les dades amb els seus titols per a que es vegi mes bonic
         static string UsuariAmigable(string linia)
         {
             string s = "";
@@ -327,15 +330,6 @@ namespace Agenda
                     s += "\n";
                 linia = linia.Substring(linia.IndexOf(",") + 1);
             }
-            /*int[] dates = new int[3];
-            dates[0] = Convert.ToInt32(linia.Substring(0, linia.IndexOf("/")));
-            linia = linia.Substring(linia.IndexOf("/") + 1);
-            dates[1] = Convert.ToInt32(linia.Substring(0, linia.IndexOf("/")));
-            linia = linia.Substring(linia.IndexOf("/") + 1);
-            dates[2] = Convert.ToInt32(linia.Substring(0, linia.IndexOf("/")));
-            linia = linia.Substring(linia.IndexOf("/") + 1);
-            s += $"{titols[6]}: {CalcularEdat(new DateTime(dates[0], dates[1], dates[2]))}";
-            */
             DateTime data = StringDataNaixementToDateTime(linia.Substring(0, linia.IndexOf(",")));
             s += $"{titols[5]}: {data.ToString("dddd, dd MMMM yyyy", new CultureInfo("ca-ES"))}\t";
             s += $"{titols[6]}: {CalcularEdat(data)} anys\n";
@@ -343,6 +337,7 @@ namespace Agenda
             s += $"{titols[7]}: {linia}";
             return s;
         }
+        // Metode StringDataNaixementToDateTime: a partir del string linia retorna 
         static DateTime StringDataNaixementToDateTime(string linia)
         {
             int[] dates = new int[3];
@@ -388,13 +383,8 @@ namespace Agenda
                     modificacio = Console.ReadLine();
                 }
                 int i = TrobarNumDada(modificacio);
-                //Console.WriteLine(i);
-                //string x = Console.ReadLine();
                 ModificarDadaUsuari(ref linia,i);
                 pregunta = $"Vols seguir modificant aquest usuari? \nUsuari: \n{UsuariAmigable(linia)}";
-                //Console.WriteLine("Vols seguir modificant aquest usuari(S/N)?");
-                //Console.WriteLine($"Usuari: \n{UsuariAmigable(linia)}");
-                //continuar = Convert.ToChar(Console.ReadLine()[0]);
             }
             while (PreguntaContinuar(pregunta));
         }
