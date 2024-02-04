@@ -18,10 +18,13 @@ namespace Agenda
                 do
                 {
                     Console.Clear();
-                    PintarMenu(Menu());
+                    PintarMenu(Menu(),opcio);
                     opcio = Console.ReadKey().KeyChar;
+                    if (opcio == 'q') opcio = 'Q';
                 }
-                while (!(opcio > '0' && opcio < '7' || opcio == 'q' || opcio == 'Q'));
+                while (!(opcio > '0' && opcio < '7' || opcio == 'Q'));
+                PintarMenu(Menu(), opcio);
+                Thread.Sleep(1000);
                 Console.Clear();
                 MostrarOpcio(opcio);
             }
@@ -63,7 +66,7 @@ namespace Agenda
         {
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Write(string.Format("{0," + ((Console.WindowWidth / 2) - (text.Length / 2) - 1) + "}", ""));
-            Console.BackgroundColor = ConsoleColor.DarkMagenta;
+            Console.BackgroundColor = ConsoleColor.Blue;
             Console.Write(string.Format($"{text}"));
             Console.BackgroundColor = ConsoleColor.Black;
             Console.WriteLine();
@@ -92,6 +95,45 @@ namespace Agenda
                     OrdenarAgenda();
                     break;
             }
+        }
+        // Mètode PintarOpcio
+        static void PintarOpcio(string agenda, char i)
+        {
+            PintarMenu(Menu(), i);
+            Thread.Sleep(1000);
+            Console.Clear();
+        }
+        static void Centrar(string text, char i)
+        {
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write(string.Format("{0," + ((Console.WindowWidth / 2) - (text.Length / 2) - 1) + "}", ""));
+            Console.BackgroundColor = ConsoleColor.Blue;
+            if (text.Contains((i)))
+            {
+                Console.Write(text.Substring(0, text.IndexOf(i)));
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.Write(string.Format($"{text.Substring(4, text.Length - 6)}"));
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("║ ");
+            }
+            else
+            {
+                Console.BackgroundColor = ConsoleColor.Blue;
+                Console.Write(string.Format($"{text}"));
+            }
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.WriteLine();
+        }
+        static void PintarMenu(string agenda, char i)
+        {
+            string linea = "", text = agenda;
+            while (text.Contains("\n"))
+            {
+                linea = text.Substring(0, text.IndexOf("\n"));
+                Centrar(linea, i);
+                text = text.Substring(text.IndexOf("\n") + 1);
+            }
+            Centrar(text);
         }
         // Donar Alta: OPCIO 1
         static void DonarAlta()
@@ -377,8 +419,7 @@ namespace Agenda
                     Console.WriteLine("Digues quina dada vols modificar");
                     modificacio = Console.ReadLine();
                 }
-                int i = TrobarNumDada(modificacio);
-                ModificarDadaUsuari(ref linia,i); //Aixo va amb un ref per a que es pugui mostrar per pantalla les dades modificades sense haver de fer un altre UsuariTrobat(nom) quan el nom podria haver sigut modificat
+                ModificarDadaUsuari(ref linia, TrobarNumDada(modificacio)); //Aixo va amb un ref per a que es pugui mostrar per pantalla les dades modificades sense haver de fer un altre UsuariTrobat(nom) quan el nom podria haver sigut modificat
                 pregunta = $"Vols seguir modificant aquest usuari? \nUsuari: \n{UsuariAmigable(linia)}";
             }
             while (PreguntaContinuar(pregunta));
