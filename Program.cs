@@ -9,7 +9,7 @@ namespace Agenda
 {
     internal class Program
     {
-        // MAIN
+        // MAIN: El main no te cap complicació, escriu el menu mentres no sigui una opcio valida
         static void Main(string[] args)
         {
             char opcio = '0';
@@ -25,10 +25,8 @@ namespace Agenda
                 Console.Clear();
                 MostrarOpcio(opcio);
             }
-            
         }
-
-        // MENU
+        // MENU: El menu retorna el string del menu
         static string Menu()
         {
             Console.Clear();
@@ -48,7 +46,7 @@ namespace Agenda
                $"\n\n" + "Prem el botó per seleccionar la opció desitjada:";
             return menu;
         }
-        // Metode PintarMenu
+        // Metode PintarMenu: Pinta el menu linia per linia, utilitza el metode Centrar
         static void PintarMenu(string menu)
         {
             string linea = "", text = menu;
@@ -60,7 +58,7 @@ namespace Agenda
             }
             Centrar(text);
         }
-        // Metode Centrar
+        // Metode Centrar: És el metode que centra, pinta i escriu una linia del menu
         static void Centrar(string text)
         {
             Console.BackgroundColor = ConsoleColor.Black;
@@ -70,7 +68,7 @@ namespace Agenda
             Console.BackgroundColor = ConsoleColor.Black;
             Console.WriteLine();
         }
-        // Metode MostrarOpcio
+        // Metode MostrarOpcio: És el metode que tria a quina de les 6 opcions anirem
         static void MostrarOpcio(char opcio)
         {
             switch (opcio)
@@ -95,11 +93,10 @@ namespace Agenda
                     break;
             }
         }
-        // Donar Alta 
+        // Donar Alta: OPCIO 1
         static void DonarAlta()
         {
-            string nom, cognom1, cognom2, dni=" ", telefon, dataNaixement, correu, persona;
-            int edat;
+            string nom, cognom1, cognom2, dni, telefon, dataNaixement, correu, persona;
             Console.WriteLine("Escriu el teu nom:");
             nom = NomVerificat(Console.ReadLine());
             Console.Clear();
@@ -122,13 +119,13 @@ namespace Agenda
         }
         // Metode CalcularEdat: A partir de un datetime retorna un int amb l'edat
         static int CalcularEdat(DateTime dataNaixement)
-            {
+        {
                 DateTime dataActual = DateTime.Now;
                 int edat = dataActual.Year - dataNaixement.Year;
                 if ((dataNaixement.Month > dataActual.Month) || (dataNaixement.Month == dataActual.Month && dataNaixement.Day > dataActual.Day))
                     edat--;
                 return edat;
-            }
+        }
         // Metode NomVerificat: Realment no verifica res, nomes esborra tot allo que no siguin lletres i posa la primera lletra a majus
         static string NomVerificat(string nom)
         {
@@ -165,13 +162,13 @@ namespace Agenda
         static bool DniValid(string dni)
         {
 
-            string dniChars = "TRWAGMYFPDXBNJZSQVHLCKET";
+            string caractersDni = "TRWAGMYFPDXBNJZSQVHLCKET";
             Regex regexDni = new Regex("^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKET]$");
             bool valid = regexDni.IsMatch(dni);
             if (valid)
             {
                 char c = dni[dni.Length - 1];
-                if (!(c == dniChars[Convert.ToInt32(dni.Substring(0, dni.Length - 1)) % 23]))
+                if (!(c == caractersDni[Convert.ToInt32(dni.Substring(0, dni.Length - 1)) % 23]))
                 {
                     valid = false;
                 }
@@ -244,7 +241,7 @@ namespace Agenda
             sr.Close();
             sw.Close();
         }
-        // Metode RecuperarUsuari: Opcio 2
+        // Metode RecuperarUsuari: OPCIO 2, En cas que acabi amb * ens podrà retornar més d'1 usuari
         static void RecuperarUsuari()
         {
             string nom, res, pregunta;
@@ -255,7 +252,6 @@ namespace Agenda
                 nom = Console.ReadLine().Trim();
                 res = "";
                 pregunta = "";
-                //continuar = 'N';
                 if (nom.EndsWith('*'))
                 {
                     nom = NomVerificat(nom);
@@ -281,7 +277,6 @@ namespace Agenda
                     Espera(5);
                 }
                 pregunta += "Vols buscar un altre?";
-
             }
             while (PreguntaContinuar(pregunta));
         }
@@ -337,18 +332,18 @@ namespace Agenda
             s += $"{titols[7]}: {linia}";
             return s;
         }
-        // Metode StringDataNaixementToDateTime: a partir del string linia retorna 
-        static DateTime StringDataNaixementToDateTime(string linia)
+        // Metode StringDataNaixementToDateTime: a partir del string data retorna la data en format DateTime (utilitza el constructor DateTime(Int32 any, Int32 mes, Int32 dia) )
+        static DateTime StringDataNaixementToDateTime(string data)
         {
             int[] dates = new int[3];
-            dates[0] = Convert.ToInt32(linia.Substring(0, linia.IndexOf(@"/")));
-            linia = linia.Substring(linia.IndexOf(@"/") + 1);
-            dates[1] = Convert.ToInt32(linia.Substring(0, linia.IndexOf(@"/")));
-            linia = linia.Substring(linia.IndexOf(@"/") + 1);
-            dates[2] = Convert.ToInt32(linia.Substring(0));
-
+            dates[0] = Convert.ToInt32(data.Substring(0, data.IndexOf(@"/")));
+            data = data.Substring(data.IndexOf(@"/") + 1);
+            dates[1] = Convert.ToInt32(data.Substring(0, data.IndexOf(@"/")));
+            data = data.Substring(data.IndexOf(@"/") + 1);
+            dates[2] = Convert.ToInt32(data.Substring(0));
             return new DateTime(dates[2], dates[1], dates[0]);
         }
+        // Metode ModificarUsuari: OPCIO 3
         static void ModificarUsuari()
         {
             string nom, modificacio, linia, pregunta;
@@ -366,7 +361,7 @@ namespace Agenda
             }
             do
             {
-                //Troba que vols modificar
+                //Troba quina es la dada que vols modificar
                 Console.Clear();
                 Console.WriteLine("Les dades del usuari són les següents:");
                 Console.WriteLine("(nom,cognom1,cognom2,dni,telefon,data de naixement,correu)");
@@ -383,11 +378,12 @@ namespace Agenda
                     modificacio = Console.ReadLine();
                 }
                 int i = TrobarNumDada(modificacio);
-                ModificarDadaUsuari(ref linia,i);
+                ModificarDadaUsuari(ref linia,i); //Aixo va amb un ref per a que es pugui mostrar per pantalla les dades modificades sense haver de fer un altre UsuariTrobat(nom) quan el nom podria haver sigut modificat
                 pregunta = $"Vols seguir modificant aquest usuari? \nUsuari: \n{UsuariAmigable(linia)}";
             }
             while (PreguntaContinuar(pregunta));
         }
+        // Metode TrobarNumDada: retorna un index depenent de quina dada entra per "nomDada"
         static int TrobarNumDada(string nomDada)
         {
             int num = -1;
@@ -421,6 +417,8 @@ namespace Agenda
             }
             return num;
         }
+        // Metode ModificarDadaUsuari: A partir de una liniaUsuari i un index modifica una dada de la linia, despres ho escriu al fitxer
+        // El parametre posModificacio ha de ser un valor entre [0,6]
         static void ModificarDadaUsuari(ref string liniaUsuari, int posModificacio)
         {
             CopiarAgendaToAux();
@@ -428,7 +426,7 @@ namespace Agenda
             StreamWriter sw = new StreamWriter(@".\agenda.txt");
             string liniaActual = sr.ReadLine();
             string novaDada = "";
-            while(liniaActual != liniaUsuari) 
+            while(!sr.EndOfStream && liniaActual != liniaUsuari) 
             {
                 sw.WriteLine(liniaActual);
                 liniaActual = sr.ReadLine();
@@ -461,11 +459,10 @@ namespace Agenda
                     case 6:
                         novaDada = VerificaCorreu();
                         break;
-                    default:
+                    default: // No hauria de passar mai ja que ens hem assegurat que no li passem cap valor diferent pero ho poso per si les mosques
                         throw new Exception("Hi ha algun error amb la posicio de la modificacio");
-                        break;
                 }
-                string liniaAnterior, liniaPosterior;
+                // Segurament hi ha una manera més senzilla de fer la modificacio pero aixo ja funciona
                 liniaActual = "";
                 for (int i = 0; i < posModificacio; i++)
                 {
@@ -490,6 +487,7 @@ namespace Agenda
             sr.Close();
             sw.Close();            
         }
+        // Metode PreguntaContinuar: És un metode generic que fa la pregunta de si vols continuar i retorna un boolea
         static bool PreguntaContinuar(string pregunta)
         {
             char opcio = ' ';
@@ -505,30 +503,36 @@ namespace Agenda
             }
             return (opcio == 'S' || opcio == 's');
         }
-
+        // Metode EliminarUsuari: OPCIO 4
         static void EliminarUsuari()
         {
-            string nom, modificacio, linia, pregunta;
+            string nom, linia;
             char continuar = 'S';
             //Troba usuari
+            Console.Clear();
             Console.WriteLine("Digues el nom del usuari que vols eliminar:");
             nom = NomVerificat(Console.ReadLine());
-            linia = UsuariTrobat(nom);
+            linia = UsuariTrobat(nom); // Es podria modificar aixo per a que en comptes de demanar nomes el nom demanes el nom i el cognom amb una sobrecarrega
             while (linia == "0")
             {
+                Console.Clear();
                 Console.WriteLine($"No s'ha trobat l'usuari amb nom: {nom}");
                 Console.WriteLine("Digues el nom del usuari que vols eliminar:");
                 nom = NomVerificat(Console.ReadLine());
                 linia = UsuariTrobat(nom);
             }
             EliminarLinia(linia);
+            Console.WriteLine("Usuari eliminat correctament!");
+            Espera(5);
         }
+        // Metode EliminarLinia: Busca al arxiu agenda.txt el parametre "string linia" i l'elimina en quan el troba
         static void EliminarLinia(string linia)
         {
             CopiarAgendaToAux();
             StreamReader sr = new StreamReader(@".\aux.txt");
             StreamWriter sw = new StreamWriter(@".\agenda.txt");
             string liniaActual = sr.ReadLine();
+            // En teoria ja ens hem assegurat previament que "linia" existeix a "sr" aixi que si no el troba no se exactament que fa (crec que o dona error o escriu un \n al final de agenda.txt)
             while (!sr.EndOfStream && linia != liniaActual)
             {
                 sw.WriteLine(liniaActual);
@@ -544,6 +548,8 @@ namespace Agenda
             sr.Close();
             sw.Close();
         }
+        // Metode CopiarAgendaToAux: Ja que faig servir un fitxer auxiliar per a diferents metodes, aquest metode copia el contingut de agenda.txt a aux.txt
+        // Segurament hi ha algun altre metode per copiar fitxers o algo aixi pero no m'he volgut liar
         static void CopiarAgendaToAux()
         {
             StreamReader sr = new StreamReader(@".\agenda.txt");
@@ -552,6 +558,7 @@ namespace Agenda
             sw.Close();
             sr.Close();
         }
+        // OPCIO 5
         static void MostrarAgenda()
         {
             OrdenarAux();
@@ -568,6 +575,7 @@ namespace Agenda
             sr.Close();
             Espera(5);
         }
+        // Metode NomsTelefon: Aquest metode retorna en un string de forma bonica el nom, cognom2, cognom2 i telefon a partir d'un "string linia"
         static string NomsTelefon(string linia)
         {
             string nom, cognom1, cognom2, telefon;
@@ -581,6 +589,7 @@ namespace Agenda
             telefon = linia.Substring(0, linia.IndexOf(','));
             return $"Nom: {nom} {cognom1} {cognom2} Tel: {telefon}";
         }
+        // OPCIO 6: 
         static void OrdenarAgenda()
         {
             OrdenarAux();
@@ -592,6 +601,7 @@ namespace Agenda
             Console.WriteLine("L'agenda s'ha ordenat correctament!");
             Espera(5);
         }
+        // Metode OrdenarAux: Agafa la agenda.txt i l'ordena al fitxer aux.txt
         static void OrdenarAux()
         {
             StreamReader sr;
@@ -625,16 +635,18 @@ namespace Agenda
             }
             sw.Close();
         }
+        // Metode Espera: Metode generic que mostra a la pantalla els segons que queden per a que el programa continuii
         static void Espera(int segons)
         {
-            Console.WriteLine("\nTornant al menu principal...");
+            Console.WriteLine("\nTornant enrera...");
             for(int i = segons; i > 0; i--)
             {
-                Console.WriteLine($"{i}s     "); //Els espais extra es perque quan passi de 10 a 9 segons no escrigui "9ss"
+                Console.WriteLine($"{i}s   "); //Els espais extra es perque quan passi de 10 a 9 segons no escrigui "9ss"
                 Thread.Sleep(1000);
                 NetejaLiniaActual();
             }
         }
+        // Metode NetejaLiniaActual: Metode generic que neteja la linia anterior que s'ha escrit i col·loca el cursor per escriure al començament d'aquella linia anterior
         static void NetejaLiniaActual()
         {
             int liniaActual = Console.CursorTop;
